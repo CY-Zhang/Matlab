@@ -11,7 +11,7 @@ Threshold = (MinIdx+1)*Detector_hist.BinWidth;
 Threshold = 10000;
 mask = heaviside(BeamOn-Threshold);
 Detector_mask = BeamOn.*mask;
-Background_mask = Detector.*(1-mask); %BG calculated in this way is
+Background_mask = BeamOn.*(1-mask); %BG calculated in this way is
 %significantly higher than expected
 Beam_level = mean(BeamOn(mask~=0));
 Dark_level = mean(BeamOn(mask==0));
