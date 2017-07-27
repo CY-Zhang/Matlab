@@ -24,7 +24,9 @@ function [preclist] = CSVPrecision(path)
                 num = num+1;
             end
         end
-        temp(templist(:),:)=[];
+%          if (templist~=[0,0])
+%             temp(templist(:),:)=[];
+%          end
         clear num;
 
         % filter peaks too close to border
@@ -36,6 +38,7 @@ function [preclist] = CSVPrecision(path)
         % filter to get one set of subset
         % click original point first, then one point along a direction and one
         % along b direction
+        figure('Name','ImageView','Position',[100 100 1000 600]);
         imshow(img,[]);hold on;
         scatter(temp(:,1)+1,temp(:,2)+1,30,'filled');
         [x_temp,y_temp] = ginput(3);
@@ -53,7 +56,8 @@ function [preclist] = CSVPrecision(path)
         % detection along a direction
         x_cor = x_temp(2);
         y_cor = y_temp(2);
-        while ( (x_cor+separation_a(1))<145 && (y_cor+separation_a(2))<145 && num<6)
+        while ( (x_cor+separation_a(1))<145 && (y_cor+separation_a(2))<145 && num<7)
+%         while ( (x_cor+separation_a(1))<145 && (y_cor+separation_a(2))<145 && num<7)
             x_cor = x_cor + separation_a(1);
             y_cor = y_cor + separation_a(2);
             [peaklist(num+1,1),peaklist(num+1,2)] = findnearestpeak(x_cor,y_cor,temp);
@@ -65,7 +69,8 @@ function [preclist] = CSVPrecision(path)
         x_cor = x_temp(1);
         y_cor = y_temp(1);
         cycle = 0;
-        while (x_cor+separation_b(1)<145 && y_cor+separation_b(2)<145 && cycle<5)
+        while (x_cor+separation_b(1)<145 && y_cor+separation_b(2)<145 && cycle<6)
+%         while (x_cor+separation_b(1)<145 && y_cor+separation_b(2)<145)
             for i = 1 : x_peaknum
                 x_cor = peaklist(cycle * x_peaknum + i, 1);
                 y_cor = peaklist(cycle * x_peaknum + i, 2);
@@ -79,14 +84,17 @@ function [preclist] = CSVPrecision(path)
             cycle = cycle + 1;
         end
 
-%         imagesc(img); hold on;
-%         scatter(peaklist(:,1)+1,peaklist(:,2)+1,30,'blue','filled');
+         imagesc(img); hold on;
+         scatter(peaklist(:,1)+1,peaklist(:,2)+1,30,'blue','filled');
 
         %% calculate precision along x and y direction with function Precision
-        y_list = Precision(peaklist(:,1),peaklist(:,2),80,80,21,15,21.19,0); %calculate y separation
-        x_list = Precision(peaklist(:,1),peaklist(:,2),10,-10,21,15,21.16,1); %calculate x separation
-        x_prec = std(x_list(:,5));
+         y_list = Precision(peaklist(:,1),peaklist(:,2),80,80,21,15,21.19,0); %calculate y separation
+%         y_list = Precision(peaklist(:,1),peaklist(:,2),80,80,21,15,19.525,0); %y precision for phantom, pixel size 19.525
+%         y_list = Precision(peaklist(:,1),peaklist(:,2),80,80,35,30,21.19,0);
         y_prec = std(y_list(:,5)); %precision in nm along x and y direction
+         x_list = Precision(peaklist(:,1),peaklist(:,2),10,-10,21,15,21.16,1); %calculate x separation
+%         x_list = Precision(peaklist(:,1),peaklist(:,2),10,-10,21,15,19.525,1); 
+        x_prec = std(x_list(:,5));
         preclist(numframe,1)=x_prec;
         preclist(numframe,2)=y_prec;
     end

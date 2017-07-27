@@ -16,10 +16,11 @@ function [distance_a]=Precision(X_location, Y_location, ang_max, ang_min, ...
 % Y_location(templist(:))=[];
 
 %% Initialize variables
+opt_sepmap = 0;
 PI = 3.1415926;
 numdumbbell = size(X_location,1);
 num = 1;
-col_x = 11;
+col_x = 7;
 col_y = 7;
 dumbbell_list = zeros(numdumbbell,4);
 dumbbell_list(:,1) = X_location;
@@ -71,42 +72,44 @@ scatter(distance_a(:,1)+1,distance_a(:,2)+1,500,distance_a(:,5),'filled','s');
 %caxis(ca_nm);
 colorbar;
 colormap hot;
-caxis([3.85 3.95]);
+% caxis([3.85 3.95]);
 %ax = gca;
 %set(gca,'Ydir','reverse','FontSize',18);
 axis equal;
 
-if opt_angle==1
-    col_x=col_x-1;
-else
-    col_y = col_y -1;
-end
-[x_temp,index] = sort(distance_a(:,1));
-y_temp = distance_a(index,2);
-z_temp = distance_a(index,5);
+if opt_sepmap
+    if opt_angle==1
+        col_x=col_x-1;
+    else
+        col_y = col_y -1;
+    end
+    [x_temp,index] = sort(distance_a(:,1));
+    y_temp = distance_a(index,2);
+    z_temp = distance_a(index,5);
 
-x_temp = reshape(x_temp,[col_y col_x]);
-y_temp = reshape(y_temp,[col_y col_x]);
-z_temp = reshape(z_temp,[col_y col_x]); 
-for j = 1:col_x
-    temp = y_temp(:,j);
-    [temp,index] = sortrows(temp);
-    y_temp(:,j) = temp;
-    temp = x_temp(:,j);
-    temp = temp(index);
-    x_temp(:,j) = temp;
-    temp = z_temp(:,j);
-    temp = temp(index);
-    z_temp(:,j) = temp;
+    x_temp = reshape(x_temp,[col_y col_x]);
+    y_temp = reshape(y_temp,[col_y col_x]);
+    z_temp = reshape(z_temp,[col_y col_x]); 
+    for j = 1:col_x
+        temp = y_temp(:,j);
+        [temp,index] = sortrows(temp);
+        y_temp(:,j) = temp;
+        temp = x_temp(:,j);
+        temp = temp(index);
+        x_temp(:,j) = temp;
+        temp = z_temp(:,j);
+        temp = temp(index);
+        z_temp(:,j) = temp;
+    end
+    % temp = reshape(distance_a(:,5),[7 10]);
+    z_temp = z_temp - mean(z_temp(:));
+    figure;
+    imagesc(flipud(z_temp));
+    colorbar;
+    colormap hot;
+    % caxis([-0.025 0.025]);
+    % caxis([3.85 3.95]);
+    axis equal off;
 end
-% temp = reshape(distance_a(:,5),[7 10]);
-z_temp = z_temp - mean(z_temp(:));
-figure;
-imagesc(flipud(z_temp));
-colorbar;
-colormap hot;
-caxis([-0.025 0.025]);
-% caxis([3.85 3.95]);
-axis equal off;
 
 end

@@ -3,20 +3,28 @@
 function [SS, thickness] = StackSSCalibrate(exp)
  % parameters
  plotresult = 0;
- min_uc = 51;   % min and max allowed thickness
- max_uc = 51;
+ min_uc = 80;   % min and max allowed thickness
+ max_uc = 95;
  plotconvergence = 1;
+ option = 2;    %option 2 for peak intensity, option 3 for average over the whole column
  
 % load in the simulation stack
- addpath('D:\2017\STO_SRO');
- sim_stack = IBWread('HAADF_stack.ibw');
+ addpath('D:\2017\SourceSize\GaN');
+ sim_stack = IBWread('GaN_HAADF.ibw');
  sim_stack = sim_stack.y;
  xcorrlist = zeros(size(sim_stack,3),1);
  SSlist = xcorrlist .* 0;
 
- 
- for layer = min_uc : max_uc
-     [SSlist(layer), xcorrlist(layer)] = SourceSizeCalibrate(exp,sim_stack(:,:,layer),plotconvergence);
+ switch option
+     case 1
+        for layer = min_uc : max_uc
+            [SSlist(layer), xcorrlist(layer)] = SourceSizeCalibrate(exp,sim_stack(:,:,layer),plotconvergence);
+        end
+     case 2
+         for layer = min_uc : max_uc
+             [SSlist(layer), xcorrlist(layer)] = PeakIntensityCalibrate(exp,sim_stack(:,:,layer),peaklist);
+         end
+     case 3
  end
  
  [~, thickness] = min(xcorrlist);
@@ -48,12 +56,28 @@ function [SS, thickness] = StackSSCalibrate(exp)
  fprintf('Sample thickness is %d layers of unit cell\n',thickness);
 end
 
+% calibrate source size with peak intensity at each point
+function [SourceSize, avg_diff] = PeakIntensityCalibrate(exp, sim)
+
+size = 40; % peak intensity range in pm
+exp_pxsize = 21.16;
+sim_pxsize = 12.89;
+size = ceil(size/exp_pxsize);
+
+ratio = sim_pxsize/exp_pxsize; %sim_pxsize/exp_pxsize
+sim_resize = imresize(sim,ratio);
+C = normxcorr2(sim_resize,exp);
+threshold = heaviside(C-0.6);
+peak = imregionalmax(C.*threshold);
+
+end
+
 % find sourcesize that would maximize the xcorrelation with given exp and
 % simulation image
 function [SourceSize, avg_xcorr] = SourceSizeCalibrate(exp, sim, plotoption)
 
 exp_pxsize = 21.16;
-sim_pxsize = 9.7625;
+sim_pxsize = 12.888;
 
 ratio = sim_pxsize/exp_pxsize; %sim_pxsize/exp_pxsize
 sim_resize = imresize(sim,ratio);

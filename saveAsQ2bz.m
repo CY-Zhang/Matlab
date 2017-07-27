@@ -1,5 +1,6 @@
 function saveAsQ2bz ( img, pathWithoutFileExtension )
-    path = [ pathWithoutFileExtension '.q2bz'];
+%     path = [ pathWithoutFileExtension '.q2bz'];
+    path = [ pathWithoutFileExtension '.q2'];
     
     fid = fopen(path, 'w');
     
@@ -17,6 +18,6 @@ function saveAsQ2bz ( img, pathWithoutFileExtension )
     
     fclose(fid);
     
-    system(sprintf('bzip2 %s', path));
-    movefile([path '.bz2'], path);
+%     system(sprintf('bzip2 %s', path));
+%     movefile([path '.bz2'], path);
 end
